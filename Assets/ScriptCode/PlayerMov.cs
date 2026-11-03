@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 
 public class PlayerMov : MonoBehaviour
 {
-    private UnityEngine.AI.NavMeshAgent agent;
+    private NavMeshAgent agent;
     public float interactionRange = 2f;
 
     private Interact pendingInteractable;
@@ -12,24 +12,34 @@ public class PlayerMov : MonoBehaviour
 
     void Start()
     {
-        // Grabs the NavMeshAgent component off your character
-        agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+        agent = GetComponent<NavMeshAgent>();
     }
 
     void Update()
     {
-        // 1. Handle Clicking
+        // 1. FREEZE MOVEMENT: Stop movement while browsing menu or placing buildings
+        bool isPlacingBuilding = BuildingPlacer.Instance != null && BuildingPlacer.Instance.pendingBuilding != null;
+        bool isMenuOpen = BuildMenuManager.Instance != null && BuildMenuManager.Instance.isMenuOpen;
+
+        if (isPlacingBuilding || isMenuOpen)
+        {
+            if (agent.hasPath) agent.ResetPath(); // Instantly stops movement
+            return; // Skip rest of movement logic while building
+        }
+
+        // 2. Handle Mouse Clicks for Movement & Interaction
         if (Input.GetMouseButtonDown(0))
         {
-            // Prevent raycasting if the mouse is currently hovering over a UI element
-            if (EventSystem.current.IsPointerOverGameObject())
+            // Prevent movement clicks if clicking UI elements
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
             {
-                return; // Stop running the rest of this code
+                return;
             }
 
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
+                // Check if the clicked object implements IInteractable (NPC, Collectible, Quest Board, etc.)
                 Interact interactable = hit.collider.GetComponent<Interact>();
                 
                 if (interactable != null)
@@ -40,6 +50,7 @@ public class PlayerMov : MonoBehaviour
                 }
                 else
                 {
+                    // Clicked regular ground
                     pendingInteractable = null;
                     pendingTargetTransform = null;
                     agent.SetDestination(hit.point);
@@ -47,7 +58,7 @@ public class PlayerMov : MonoBehaviour
             }
         }
 
-        // 2. Handle Auto-Interaction
+        // 3. Handle Auto-Interaction when arriving in range
         if (pendingInteractable != null && pendingTargetTransform != null)
         {
             float distance = Vector3.Distance(transform.position, pendingTargetTransform.position);

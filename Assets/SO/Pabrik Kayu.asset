@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 891641ef0080e6f469fa7e6d4a8609c3, type: 3}
+  m_Name: Pabrik Kayu
+  m_EditorClassIdentifier: Assembly-CSharp::BuildingData
+  buildingName: Pabrik Kayu
+  description: Pabrik Kayu Untuk Menghasilkan Furnitur
+  uiIcon: {fileID: 0}
+  buildingPrefab: {fileID: 3318731527439585546, guid: a6779f465cce194479fc3b466e395c26, type: 3}
+  rockCost: 30
+  woodCost: 45
