@@ -26,7 +26,10 @@ public class PlayerMov : MonoBehaviour
             if (agent.hasPath) agent.ResetPath(); // Instantly stops movement
             return; // Skip rest of movement logic while building
         }
-
+        if (BuildingPlacer.Instance != null && (Time.time - BuildingPlacer.Instance.lastPlacementTime < 0.2f))
+         {
+            return;
+        }
         // 2. Handle Mouse Clicks for Movement & Interaction
         if (Input.GetMouseButtonDown(0))
         {

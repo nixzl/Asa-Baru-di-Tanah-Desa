@@ -4,6 +4,8 @@ using TMPro;
 public class ResourceManager : MonoBehaviour
 {
     public static ResourceManager Instance;
+    public int totalWorkers = 3;
+    public int availableWorkers = 3;
 
     [Header("Resource Caps")]
     public int maxResourceCapacity = 1000;
@@ -25,6 +27,31 @@ public class ResourceManager : MonoBehaviour
     void Start()
     {
         UpdateUI();
+    }
+
+    public void AddPopulation(int amount)
+    {
+        totalWorkers += amount;
+        availableWorkers += amount;
+
+    }
+
+    public bool AssignWorker()
+    {
+        if (availableWorkers > 0)
+        {
+            availableWorkers--;
+            return true;
+        }
+        return false;
+    }
+
+    public void UnassignWorker()
+    {
+        if (availableWorkers < totalWorkers)
+        {
+            availableWorkers++;
+        }
     }
 
     public void AddRock(int amount)

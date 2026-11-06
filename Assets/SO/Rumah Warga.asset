@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 891641ef0080e6f469fa7e6d4a8609c3, type: 3}
+  m_Name: Rumah Warga
+  m_EditorClassIdentifier: Assembly-CSharp::BuildingData
+  requiredTotalPopulation: 3
+  buildingName: Rumah Warga
+  description: 
+  uiIcon: {fileID: 0}
+  buildingPrefab: {fileID: 8717772090231240208, guid: 03b79d5a8f55e144688dd0cbe890fb3a, type: 3}
+  rockCost: 100
+  woodCost: 50

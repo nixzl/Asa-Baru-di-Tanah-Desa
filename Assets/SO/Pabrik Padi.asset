@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 891641ef0080e6f469fa7e6d4a8609c3, type: 3}
+  m_Name: Pabrik Padi
+  m_EditorClassIdentifier: Assembly-CSharp::BuildingData
+  requiredTotalPopulation: 0
+  buildingName: Pabrik Padi
+  description: 
+  uiIcon: {fileID: 0}
+  buildingPrefab: {fileID: 5880005704034721422, guid: fb4828f694e94ae408a69f1e5581c749, type: 3}
+  rockCost: 30
+  woodCost: 50

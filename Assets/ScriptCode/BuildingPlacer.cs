@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 public class BuildingPlacer : MonoBehaviour
 {
     public static BuildingPlacer Instance;
-
+    public float lastPlacementTime = 0f;
     public BuildingData pendingBuilding;
     private GameObject previewBuilding; 
     private float currentRotation = 0f;
@@ -68,6 +68,7 @@ public class BuildingPlacer : MonoBehaviour
                     if (ResourceManager.Instance.CanAfford(pendingBuilding.rockCost, pendingBuilding.woodCost))
                     {
                         ResourceManager.Instance.SpendResources(pendingBuilding.rockCost, pendingBuilding.woodCost);
+                        lastPlacementTime = Time.time;
 
                         // Finalize placement: Restore default layers and physics
                         SetLayerRecursively(previewBuilding, LayerMask.NameToLayer("Default"));
