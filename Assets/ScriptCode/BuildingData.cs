@@ -3,6 +3,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "New Building", menuName = "CityBuilder/Building Data")]
 public class BuildingData : ScriptableObject
 {
+    public int workersProvided = 0;
     public int requiredTotalPopulation = 0;
     [Header("Display Info")]
     public string buildingName;

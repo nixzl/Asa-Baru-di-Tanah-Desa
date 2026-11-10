@@ -40,6 +40,10 @@ public class BuildMenuManager : MonoBehaviour
     public void ToggleBuildMenu()
     {
         isMenuOpen = !isMenuOpen;
+        if (isMenuOpen)
+        {
+            PopulateMenu();
+        }
         buildMenuPanel.SetActive(isMenuOpen);
 
         if (isMenuOpen && BuildingPlacer.Instance != null && BuildingPlacer.Instance.pendingBuilding != null)

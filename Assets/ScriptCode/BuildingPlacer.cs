@@ -68,6 +68,7 @@ public class BuildingPlacer : MonoBehaviour
                     if (ResourceManager.Instance.CanAfford(pendingBuilding.rockCost, pendingBuilding.woodCost))
                     {
                         ResourceManager.Instance.SpendResources(pendingBuilding.rockCost, pendingBuilding.woodCost);
+                        ResourceManager.Instance.AddPopulation(pendingBuilding.workersProvided);
                         lastPlacementTime = Time.time;
 
                         // Finalize placement: Restore default layers and physics

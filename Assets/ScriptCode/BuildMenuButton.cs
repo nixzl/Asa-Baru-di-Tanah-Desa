@@ -7,7 +7,7 @@ public class BuildMenuButton : MonoBehaviour
     public Image iconImage;
     public TextMeshProUGUI buildingNameText;
     public TextMeshProUGUI costText;
-    public Button myButton; // Drag the Button component here in the Inspector
+    public Button myButton; // The UI button component itself
 
     private BuildingData buildingData;
 
@@ -17,20 +17,33 @@ public class BuildMenuButton : MonoBehaviour
         buildingData = data;
 
         if (iconImage != null && data.uiIcon != null) iconImage.sprite = data.uiIcon;
-        if (buildingNameText != null) buildingNameText.text = data.buildingName;
-        if (costText != null) costText.text = $"R: {data.rockCost} | W: {data.woodCost}";
+        if (costText != null) costText.text = $"   R: {data.rockCost}    W: {data.woodCost}";
 
-        // LOCK SYSTEM: Disable the button if population is too low
-        if (ResourceManager.Instance.totalWorkers < data.requiredTotalPopulation)
+        // Check if the player has enough population
+        bool isUnlocked = ResourceManager.Instance.totalWorkers >= data.requiredTotalPopulation;
+
+        // 1. Safely lock/unlock the button
+        if (myButton != null)
         {
-            myButton.interactable = false;
-            buildingNameText.text = data.buildingName + " (Locked)";
-            buildingNameText.color = Color.red;
+            myButton.interactable = isUnlocked;
         }
         else
         {
-            myButton.interactable = true;
-            buildingNameText.color = Color.white;
+            Debug.LogWarning("My Button is missing in the Inspector!", this);
+        }
+
+        // 2. Safely apply the building name and (Locked) text
+        if (buildingNameText != null)
+        {
+            if (isUnlocked)
+            {
+
+            }
+            else
+            {
+                buildingNameText.text =   " (Locked)";
+                buildingNameText.color = Color.red;
+            }
         }
     }
 

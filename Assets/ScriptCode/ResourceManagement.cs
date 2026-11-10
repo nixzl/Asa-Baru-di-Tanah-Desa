@@ -31,9 +31,11 @@ public class ResourceManager : MonoBehaviour
 
     public void AddPopulation(int amount)
     {
+        if (amount <=0) return;
+
         totalWorkers += amount;
         availableWorkers += amount;
-
+        UpdateUI();
     }
 
     public bool AssignWorker()
