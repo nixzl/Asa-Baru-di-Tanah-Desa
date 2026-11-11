@@ -4,6 +4,16 @@ using System.Collections.Generic;
 public class BuildMenuManager : MonoBehaviour
 {
     public static BuildMenuManager Instance;
+    [Header("Animate for panel open/close")]
+    public RectTransform buildMenuRect;
+    public Vector2 menuClosedPos = new Vector2(0, -1000);
+    public Vector2 menuOpenPos = new Vector2(0, 0);  
+
+    [Header("Animation Settings")]
+    public RectTransform actionButtonsGroup;
+    public Vector2 buttonClosedPosition;
+    public Vector2 buttonOpenPosition;
+    public float animationDuration = 10f;
 
     [Header("UI References")]
     public GameObject buildMenuPanel;
@@ -35,6 +45,20 @@ public class BuildMenuManager : MonoBehaviour
         {
             ToggleBuildMenu();
         }
+        if (actionButtonsGroup != null)
+        {
+            Vector2 targetPosition = isMenuOpen ? buttonOpenPosition : buttonClosedPosition;
+            actionButtonsGroup.anchoredPosition = Vector2.Lerp(actionButtonsGroup.anchoredPosition, targetPosition, Time.deltaTime * animationDuration);
+        }
+        if (buildMenuRect != null && buildMenuPanel.activeSelf)
+        {
+            Vector2 targetMenuPos = isMenuOpen ? menuOpenPos : menuClosedPos;
+            buildMenuRect.anchoredPosition = Vector2.Lerp(buildMenuRect.anchoredPosition, targetMenuPos, Time.deltaTime * animationDuration);
+            if (!isMenuOpen && Vector2.Distance(buildMenuRect.anchoredPosition, menuClosedPos) <5f)
+            {
+                buildMenuPanel.SetActive(false);
+            }
+        }
     }
 
     public void ToggleBuildMenu()
@@ -42,10 +66,14 @@ public class BuildMenuManager : MonoBehaviour
         isMenuOpen = !isMenuOpen;
         if (isMenuOpen)
         {
+            buildMenuPanel.SetActive(true);
+            if (buildMenuRect != null) buildMenuRect.anchoredPosition = menuClosedPos;
             PopulateMenu();
         }
-        buildMenuPanel.SetActive(isMenuOpen);
-
+        else
+        {
+            
+        }
         if (isMenuOpen && BuildingPlacer.Instance != null && BuildingPlacer.Instance.pendingBuilding != null)
         {
             BuildingPlacer.Instance.CancelPlacement();

@@ -5,6 +5,7 @@ public class BuildingData : ScriptableObject
 {
     public int workersProvided = 0;
     public int requiredTotalPopulation = 0;
+    public int requiredTotalReputation = 1;
     [Header("Display Info")]
     public string buildingName;
     public string description;

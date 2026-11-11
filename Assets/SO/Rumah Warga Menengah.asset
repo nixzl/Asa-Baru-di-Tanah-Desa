@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BuildingData
   workersProvided: 4
   requiredTotalPopulation: 10
+  requiredTotalReputation: 2
   buildingName: Rumah Warga (menengah)
   description: 
   uiIcon: {fileID: -1056758657, guid: a435911d667a87745962edc6ed900373, type: 3}

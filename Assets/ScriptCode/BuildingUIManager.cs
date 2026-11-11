@@ -82,9 +82,9 @@ public class BuildingUIManager : MonoBehaviour
 
     private void UpdateUI()
     {
-        statusText.text = $"Idle Workers: {ResourceManager.Instance.availableWorkers - pendingWorkers}\n" +
-                          $"Requires at least {currentBuilding.minWorkersRequired} workers\n\n" +
-                          $"Assigning: {pendingWorkers} Workers";
+        statusText.text = $"Pekerja Tersedia: {ResourceManager.Instance.availableWorkers - pendingWorkers}\n" +
+                          $"Membutuhkan {currentBuilding.minWorkersRequired} pekerja\n\n" +
+                          $"Menambahkan: {pendingWorkers} pekerja";
 
         // Enforce logic: Block the Start button if requirements aren't met
         bool hasEnoughWorkers = pendingWorkers >= currentBuilding.minWorkersRequired;

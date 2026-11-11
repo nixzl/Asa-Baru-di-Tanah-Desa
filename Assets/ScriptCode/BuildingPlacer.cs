@@ -3,6 +3,8 @@ using UnityEngine.EventSystems;
 
 public class BuildingPlacer : MonoBehaviour
 {
+    [Header("Placement Settings")]
+    public GameObject instructionTextUI;
     public static BuildingPlacer Instance;
     public float lastPlacementTime = 0f;
     public BuildingData pendingBuilding;
@@ -24,12 +26,15 @@ public class BuildingPlacer : MonoBehaviour
 
         previewBuilding = Instantiate(buildingToPlace.buildingPrefab);
         SetLayerRecursively(previewBuilding, LayerMask.NameToLayer("Ignore Raycast"));
+
+        if (instructionTextUI != null) instructionTextUI.SetActive(true);
     }
 
     public void CancelPlacement()
 {
     if (previewBuilding != null) Destroy(previewBuilding);
     pendingBuilding = null;
+    if (instructionTextUI != null) instructionTextUI.SetActive(false);
 }
 
     void Update()
@@ -70,6 +75,8 @@ public class BuildingPlacer : MonoBehaviour
                         ResourceManager.Instance.SpendResources(pendingBuilding.rockCost, pendingBuilding.woodCost);
                         ResourceManager.Instance.AddPopulation(pendingBuilding.workersProvided);
                         lastPlacementTime = Time.time;
+
+                        if (instructionTextUI != null) instructionTextUI.SetActive(false);
 
                         // Finalize placement: Restore default layers and physics
                         SetLayerRecursively(previewBuilding, LayerMask.NameToLayer("Default"));

@@ -6,8 +6,12 @@ public class BuildMenuButton : MonoBehaviour
 {
     public Image iconImage;
     public TextMeshProUGUI buildingNameText;
-    public TextMeshProUGUI costText;
-    public Button myButton; // The UI button component itself
+    
+    // NEW: Separated UI text elements for costs
+    public TextMeshProUGUI rockCostText;
+    public TextMeshProUGUI woodCostText;
+    
+    public Button myButton; 
 
     private BuildingData buildingData;
 
@@ -17,10 +21,14 @@ public class BuildMenuButton : MonoBehaviour
         buildingData = data;
 
         if (iconImage != null && data.uiIcon != null) iconImage.sprite = data.uiIcon;
-        if (costText != null) costText.text = $"   R: {data.rockCost}    W: {data.woodCost}";
+        
+        // NEW: Assign costs to their individual text objects
+        if (rockCostText != null) rockCostText.text = data.rockCost.ToString();
+        if (woodCostText != null) woodCostText.text = data.woodCost.ToString();
 
         // Check if the player has enough population
-        bool isUnlocked = ResourceManager.Instance.totalWorkers >= data.requiredTotalPopulation;
+        bool isUnlocked = ResourceManager.Instance.totalWorkers >= data.requiredTotalPopulation && 
+                          ReputationManager.Instance.currentLevel >= data.requiredTotalReputation;
 
         // 1. Safely lock/unlock the button
         if (myButton != null)
@@ -41,7 +49,7 @@ public class BuildMenuButton : MonoBehaviour
             }
             else
             {
-                buildingNameText.text =   " (Locked)";
+                buildingNameText.text = " (Terkunci) " + data.buildingName;
                 buildingNameText.color = Color.red;
             }
         }

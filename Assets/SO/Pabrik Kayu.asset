@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 891641ef0080e6f469fa7e6d4a8609c3, type: 3}
   m_Name: Pabrik Kayu
   m_EditorClassIdentifier: Assembly-CSharp::BuildingData
+  workersProvided: 0
   requiredTotalPopulation: 5
+  requiredTotalReputation: 2
   buildingName: Pabrik Kayu
   description: Pabrik Kayu Untuk Menghasilkan Furnitur
   uiIcon: {fileID: 0}

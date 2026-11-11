@@ -17,6 +17,7 @@ public class ResourceManager : MonoBehaviour
     [Header("UI Text Elements")]
     public TextMeshProUGUI rockAmountText;
     public TextMeshProUGUI woodAmountText;
+    public TextMeshProUGUI popualtionAmountText;
 
     void Awake()
     {
@@ -95,5 +96,6 @@ public class ResourceManager : MonoBehaviour
         // Updates the UI to show the format "Current / Max" (e.g., "1000 / 1000")
         if (rockAmountText != null) rockAmountText.text = currentRock.ToString() + "/" + maxResourceCapacity.ToString();
         if (woodAmountText != null) woodAmountText.text = currentWood.ToString() + "/" + maxResourceCapacity.ToString();
+        if (popualtionAmountText != null) popualtionAmountText.text = availableWorkers.ToString() + "/" + totalWorkers.ToString();
     }
 }
