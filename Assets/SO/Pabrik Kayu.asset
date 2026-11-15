@@ -17,7 +17,7 @@ MonoBehaviour:
   requiredTotalReputation: 2
   buildingName: Pabrik Kayu
   description: Pabrik Kayu Untuk Menghasilkan Furnitur
-  uiIcon: {fileID: 0}
+  uiIcon: {fileID: -423038981, guid: a227c9161e3f8ff48be4edca45878c18, type: 3}
   buildingPrefab: {fileID: 3318731527439585546, guid: a6779f465cce194479fc3b466e395c26, type: 3}
   rockCost: 30
   woodCost: 45

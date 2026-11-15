@@ -12,9 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 891641ef0080e6f469fa7e6d4a8609c3, type: 3}
   m_Name: Ladang
   m_EditorClassIdentifier: Assembly-CSharp::BuildingData
+  workersProvided: 0
+  requiredTotalPopulation: 0
+  requiredTotalReputation: 1
   buildingName: Ladang
   description: Ladang untuk padi
-  uiIcon: {fileID: 0}
+  uiIcon: {fileID: 1041542121, guid: a227c9161e3f8ff48be4edca45878c18, type: 3}
   buildingPrefab: {fileID: 8651347476916943501, guid: cef79c9b2ea474443938205b88699658, type: 3}
   rockCost: 5
   woodCost: 30

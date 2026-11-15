@@ -12,10 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 891641ef0080e6f469fa7e6d4a8609c3, type: 3}
   m_Name: Pabrik Padi
   m_EditorClassIdentifier: Assembly-CSharp::BuildingData
+  workersProvided: 0
   requiredTotalPopulation: 0
+  requiredTotalReputation: 1
   buildingName: Pabrik Padi
   description: 
-  uiIcon: {fileID: 0}
+  uiIcon: {fileID: -1150982219, guid: a227c9161e3f8ff48be4edca45878c18, type: 3}
   buildingPrefab: {fileID: 5880005704034721422, guid: fb4828f694e94ae408a69f1e5581c749, type: 3}
   rockCost: 30
   woodCost: 50
