@@ -17,7 +17,7 @@ MonoBehaviour:
   requiredTotalReputation: 1
   buildingName: Ladang
   description: Ladang untuk padi
-  uiIcon: {fileID: 1041542121, guid: a227c9161e3f8ff48be4edca45878c18, type: 3}
+  uiIcon: {fileID: -874914498, guid: f5f5b40fdcd3e0443be3981e21ee9e78, type: 3}
   buildingPrefab: {fileID: 8651347476916943501, guid: cef79c9b2ea474443938205b88699658, type: 3}
   rockCost: 5
   woodCost: 30

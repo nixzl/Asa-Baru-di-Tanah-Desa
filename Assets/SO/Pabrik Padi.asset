@@ -17,7 +17,7 @@ MonoBehaviour:
   requiredTotalReputation: 1
   buildingName: Pabrik Padi
   description: 
-  uiIcon: {fileID: -1150982219, guid: a227c9161e3f8ff48be4edca45878c18, type: 3}
+  uiIcon: {fileID: 848331959, guid: f5f5b40fdcd3e0443be3981e21ee9e78, type: 3}
   buildingPrefab: {fileID: 5880005704034721422, guid: fb4828f694e94ae408a69f1e5581c749, type: 3}
   rockCost: 30
   woodCost: 50

@@ -958,9 +958,9 @@ TextureImporter:
       name: ui_2_Versi 2_39
       rect:
         serializedVersion: 2
-        x: 921
+        x: 947
         y: 6
-        width: 202
+        width: 176
         height: 203
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
