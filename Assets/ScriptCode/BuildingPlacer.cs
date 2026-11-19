@@ -74,6 +74,11 @@ public class BuildingPlacer : MonoBehaviour
                     {
                         ResourceManager.Instance.SpendResources(pendingBuilding.rockCost, pendingBuilding.woodCost);
                         ResourceManager.Instance.AddPopulation(pendingBuilding.workersProvided);
+
+                        if (QuestManager.Instance != null)
+                        {
+                            QuestManager.Instance.OnBuildingConstructed(pendingBuilding.buildingName);
+                        }
                         lastPlacementTime = Time.time;
 
                         if (instructionTextUI != null) instructionTextUI.SetActive(false);

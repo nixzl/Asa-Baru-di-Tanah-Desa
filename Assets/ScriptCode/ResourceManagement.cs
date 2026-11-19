@@ -1,6 +1,9 @@
 using UnityEngine;
 using TMPro; 
 
+// Moved OUTSIDE ResourceManager so QuestManager and other scripts can access it directly
+public enum ResourceCategory { Stone, Wood, Wheat }
+
 public class ResourceManager : MonoBehaviour
 {
     public static ResourceManager Instance;
@@ -13,9 +16,11 @@ public class ResourceManager : MonoBehaviour
     [Header("Current Resources")]
     public int currentRock = 50;
     public int currentWood = 50;
+    public int currentWheat = 50;
 
     [Header("UI Text Elements")]
     public TextMeshProUGUI rockAmountText;
+    public TextMeshProUGUI wheatAmountText;
     public TextMeshProUGUI woodAmountText;
     public TextMeshProUGUI popualtionAmountText;
 
@@ -30,9 +35,42 @@ public class ResourceManager : MonoBehaviour
         UpdateUI();
     }
 
+    public void AddWheat(int amount)
+    {
+        currentWheat = Mathf.Min(currentWheat + amount, maxResourceCapacity);
+        UpdateUI(); // Added so Wheat UI updates immediately
+    }
+
+    public bool HasResource(ResourceCategory type, int amount)
+    {
+        switch (type)
+        {
+            case ResourceCategory.Stone: return currentRock >= amount;
+            case ResourceCategory.Wood:  return currentWood >= amount;
+            case ResourceCategory.Wheat: return currentWheat >= amount;
+            default: return false;
+        }
+    }
+
+    public bool SpendSingleResource(ResourceCategory type, int amount)
+    {
+        if (!HasResource(type, amount)) return false;
+
+        // Fixed: Actually deducts the delivered resource instead of returning a comparison
+        switch (type)
+        {
+            case ResourceCategory.Stone: currentRock -= amount; break;
+            case ResourceCategory.Wood:  currentWood -= amount; break;
+            case ResourceCategory.Wheat: currentWheat -= amount; break;   
+        }
+
+        UpdateUI();
+        return true;
+    }
+
     public void AddPopulation(int amount)
     {
-        if (amount <=0) return;
+        if (amount <= 0) return;
 
         totalWorkers += amount;
         availableWorkers += amount;
@@ -44,6 +82,7 @@ public class ResourceManager : MonoBehaviour
         if (availableWorkers > 0)
         {
             availableWorkers--;
+            UpdateUI(); // Added so Population UI updates when workers start working
             return true;
         }
         return false;
@@ -54,13 +93,13 @@ public class ResourceManager : MonoBehaviour
         if (availableWorkers < totalWorkers)
         {
             availableWorkers++;
+            UpdateUI(); // Added so Population UI updates when workers finish
         }
     }
 
     public void AddRock(int amount)
     {
         currentRock += amount;
-        // Forces currentRock to stay at or below maxResourceCapacity
         currentRock = Mathf.Min(currentRock, maxResourceCapacity);
         UpdateUI();
     }
@@ -68,7 +107,6 @@ public class ResourceManager : MonoBehaviour
     public void AddWood(int amount)
     {
         currentWood += amount;
-        // Forces currentWood to stay at or below maxResourceCapacity
         currentWood = Mathf.Min(currentWood, maxResourceCapacity);
         UpdateUI();
     }
@@ -80,7 +118,7 @@ public class ResourceManager : MonoBehaviour
             return true;
         }
         
-        Debug.Log("Not enough resources to build this!");
+        Debug.Log("Bahan Tidak Cukup");
         return false;
     }
 
@@ -93,9 +131,9 @@ public class ResourceManager : MonoBehaviour
 
     private void UpdateUI()
     {
-        // Updates the UI to show the format "Current / Max" (e.g., "1000 / 1000")
         if (rockAmountText != null) rockAmountText.text = currentRock.ToString() + "/" + maxResourceCapacity.ToString();
         if (woodAmountText != null) woodAmountText.text = currentWood.ToString() + "/" + maxResourceCapacity.ToString();
+        if (wheatAmountText != null) wheatAmountText.text = currentWheat.ToString() + "/" + maxResourceCapacity.ToString(); // Fixed: was updating woodAmountText
         if (popualtionAmountText != null) popualtionAmountText.text = availableWorkers.ToString() + "/" + totalWorkers.ToString();
     }
 }
