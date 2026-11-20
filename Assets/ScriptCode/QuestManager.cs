@@ -16,10 +16,16 @@ public class Quest
     [TextArea] public string description = "Chop down trees to gather 20 wood.";
 
     [Header("Target Settings")]
-    public ResourceCategory targetResource = ResourceCategory.Wood; // Used for CollectResource & DeliverToNPC
-    public string targetBuildingName = "House"; // Must match BuildingData.buildingName for BuildBuilding
+    public ResourceCategory targetResource = ResourceCategory.Wood;
+    public string targetBuildingName = "House";
     public int targetAmount = 20;
     [HideInInspector] public int currentAmount = 0;
+
+    [Header("Time Limit (Optional)")]
+    public bool hasTimeLimit = false;
+    public float timeLimitSeconds = 120f;
+    [HideInInspector] public float remainingTime = 0f;
+    [HideInInspector] public bool isFailed = false;
 
     [Header("Rewards")]
     public float reputationReward = 50f;
@@ -40,23 +46,24 @@ public class QuestManager : MonoBehaviour
     private Quest selectedQuest;
 
     [Header("Left Sidebar Dropdowns")]
-    public RectTransform sidebarContentRect;   // Parent container holding both category buttons & lists
-    public Transform mainQuestListContainer;   // Child container directly under "Misi Utama" button
-    public Transform sideQuestListContainer;   // Child container directly under "Misi Sampingan" button
-    public GameObject questButtonPrefab;       // Prefab with QuestListButton attached
+    public RectTransform sidebarContentRect;
+    public Transform mainQuestListContainer;
+    public Transform sideQuestListContainer;
+    public GameObject questButtonPrefab;
 
     [Header("Dropdown Animation")]
     public float dropdownSlideSpeed = 12f;
     public bool startDropdownsOpen = true;
 
     [Header("Right Detail Panel")]
-    public TextMeshProUGUI questTitleText;       // Top title text
-    public TextMeshProUGUI questDescriptionText; // Middle description text
-    public TextMeshProUGUI questRewardText;      // Reward text
-    public TextMeshProUGUI questStatusText;      // Bottom-left status text
-    public TextMeshProUGUI questProgressText;    // Bottom progress text (e.g., "0/5")
-    public Button actionButton;                  // Green "Oke" button
-    public TextMeshProUGUI actionButtonText;     // Text inside "Oke" button
+    public TextMeshProUGUI questTitleText;
+    public TextMeshProUGUI questDescriptionText;
+    public TextMeshProUGUI questRewardText;
+    public TextMeshProUGUI questStatusText;
+    public TextMeshProUGUI questProgressText;
+    public TextMeshProUGUI questTimerText; // Optional: leave empty to show timer inside Status Text
+    public Button actionButton;
+    public TextMeshProUGUI actionButtonText;
 
     private bool isMainDropdownOpen;
     private bool isSideDropdownOpen;
@@ -67,21 +74,18 @@ public class QuestManager : MonoBehaviour
     private RectTransform sideListRect;
     private LayoutElement mainListLayout;
     private LayoutElement sideListLayout;
+    private Color defaultStatusColor = Color.white;
 
     void Awake()
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
+
+        if (questStatusText != null) defaultStatusColor = questStatusText.color;
     }
 
     void Start()
     {
-        if (quests.Count == 0)
-        {
-            SetupDefaultTestQuests();
-        }
-
-        // Cache RectTransforms and LayoutElements for smooth height animation
         if (mainQuestListContainer != null)
         {
             mainListRect = mainQuestListContainer.GetComponent<RectTransform>();
@@ -101,7 +105,6 @@ public class QuestManager : MonoBehaviour
 
         RefreshQuestLists();
 
-        // Snap to initial open/closed heights without animating on scene start
         mainCurrentHeight = isMainDropdownOpen ? GetUnconstrainedHeight(mainListRect, mainListLayout) : 0f;
         sideCurrentHeight = isSideDropdownOpen ? GetUnconstrainedHeight(sideListRect, sideListLayout) : 0f;
 
@@ -113,6 +116,44 @@ public class QuestManager : MonoBehaviour
     }
 
     void Update()
+    {
+        UpdateQuestTimers();
+        UpdateDropdownAnimations();
+    }
+
+    private void UpdateQuestTimers()
+    {
+        bool anyQuestFailedThisFrame = false;
+
+        foreach (Quest q in quests)
+        {
+            if (q.hasTimeLimit && !q.isCompleted && !q.isClaimed && !q.isFailed)
+            {
+                q.remainingTime -= Time.deltaTime;
+
+                if (q.remainingTime <= 0f)
+                {
+                    q.remainingTime = 0f;
+                    q.isFailed = true;
+                    anyQuestFailedThisFrame = true;
+                    Debug.Log($"Misi Gagal (Waktu Habis!): {q.questTitle}");
+                }
+            }
+        }
+
+        if (anyQuestFailedThisFrame)
+        {
+            RefreshQuestLists();
+            UpdateDetailUI();
+        }
+        else if (selectedQuest != null && selectedQuest.hasTimeLimit && !selectedQuest.isCompleted && !selectedQuest.isFailed)
+        {
+            // Keep countdown ticking live while viewing a timed quest
+            UpdateDetailUI();
+        }
+    }
+
+    private void UpdateDropdownAnimations()
     {
         bool needsLayoutRebuild = false;
 
@@ -148,44 +189,32 @@ public class QuestManager : MonoBehaviour
         }
     }
 
-    private void SetupDefaultTestQuests()
+    // --- QUEST ACCEPTANCE ---
+    public bool HasQuest(Quest quest)
     {
-        quests.Add(new Quest
-        {
-            questTitle = "Lumberjack",
-            category = QuestCategory.MisiUtama,
-            questType = QuestType.CollectResource,
-            targetResource = ResourceCategory.Wood,
-            targetAmount = 20,
-            description = "Collect 20 Wood from trees around the map.",
-            reputationReward = 40f,
-            rockReward = 15
-        });
+        return quests.Contains(quest);
+    }
 
-        quests.Add(new Quest
-        {
-            questTitle = "Expand Village",
-            category = QuestCategory.MisiUtama,
-            questType = QuestType.BuildBuilding,
-            targetBuildingName = "House",
-            targetAmount = 2,
-            description = "Construct 2 Houses to increase village workers.",
-            reputationReward = 60f,
-            woodReward = 25
-        });
+    public void AcceptQuest(Quest newQuest)
+    {
+        if (newQuest == null) return;
 
-        quests.Add(new Quest
+        // Allow re-accepting if the player previously failed this timed quest
+        if (quests.Contains(newQuest) && !newQuest.isFailed) return;
+
+        newQuest.currentAmount = 0;
+        newQuest.isCompleted = false;
+        newQuest.isClaimed = false;
+        newQuest.isFailed = false;
+        newQuest.remainingTime = newQuest.hasTimeLimit ? newQuest.timeLimitSeconds : 0f;
+
+        if (!quests.Contains(newQuest))
         {
-            questTitle = "Supply the Villager",
-            category = QuestCategory.MisiSampingan,
-            questType = QuestType.DeliverToNPC,
-            targetResource = ResourceCategory.Wheat,
-            targetAmount = 15,
-            description = "Deliver 15 Wheat to the NPC (talk to the NPC or press Give).",
-            reputationReward = 50f,
-            rockReward = 20,
-            woodReward = 20
-        });
+            quests.Add(newQuest);
+        }
+
+        RefreshQuestLists();
+        SelectQuest(newQuest);
     }
 
     // --- DROPDOWN TOGGLES ---
@@ -250,7 +279,7 @@ public class QuestManager : MonoBehaviour
         for (int i = container.childCount - 1; i >= 0; i--)
         {
             Transform child = container.GetChild(i);
-            child.SetParent(null); // Detach immediately so LayoutUtility doesn't double-count before end of frame
+            child.SetParent(null);
             Destroy(child.gameObject);
         }
     }
@@ -267,7 +296,7 @@ public class QuestManager : MonoBehaviour
         if (selectedQuest == null) return;
 
         int displayProgress = selectedQuest.currentAmount;
-        if (selectedQuest.questType == QuestType.DeliverToNPC && !selectedQuest.isCompleted && ResourceManager.Instance != null)
+        if (selectedQuest.questType == QuestType.DeliverToNPC && !selectedQuest.isCompleted && !selectedQuest.isFailed && ResourceManager.Instance != null)
         {
             switch (selectedQuest.targetResource)
             {
@@ -283,44 +312,84 @@ public class QuestManager : MonoBehaviour
 
         if (questRewardText != null)
         {
-            string rewards = $"Reward: +{selectedQuest.reputationReward} Rep";
+            string rewards = $"Hadiah: +{selectedQuest.reputationReward} Rep";
             if (selectedQuest.rockReward > 0) rewards += $"  +{selectedQuest.rockReward} Batu";
             if (selectedQuest.woodReward > 0) rewards += $"  +{selectedQuest.woodReward} Kayu";
-            if (selectedQuest.wheatReward > 0) rewards += $" +{selectedQuest.wheatReward} Gandum";
+            if (selectedQuest.wheatReward > 0) rewards += $"  +{selectedQuest.wheatReward} Gandum";
             questRewardText.text = rewards;
         }
 
-        if (selectedQuest.isClaimed)
+        string timerTag = "";
+        if (selectedQuest.hasTimeLimit)
         {
-            if (questStatusText != null) questStatusText.text = "Selesai";
+            string formatted = FormatTime(selectedQuest.remainingTime);
+            if (questTimerText != null)
+            {
+                questTimerText.gameObject.SetActive(true);
+                questTimerText.text = selectedQuest.isFailed ? "00:00" : formatted;
+            }
+            else if (!selectedQuest.isCompleted && !selectedQuest.isFailed)
+            {
+                timerTag = $"  /  Waktu: {formatted}";
+            }
+        }
+        else if (questTimerText != null)
+        {
+            questTimerText.gameObject.SetActive(false);
+        }
+
+        if (questStatusText != null) questStatusText.color = defaultStatusColor;
+
+        if (selectedQuest.isFailed)
+        {
+            if (questStatusText != null)
+            {
+                questStatusText.text = "GAGAL (WAKTU HABIS!)";
+                questStatusText.color = Color.red;
+            }
             if (actionButton != null) actionButton.interactable = false;
-            if (actionButtonText != null) actionButtonText.text = "Selesai";
+            if (actionButtonText != null) actionButtonText.text = "GAGAL";
+        }
+        else if (selectedQuest.isClaimed)
+        {
+            if (questStatusText != null) questStatusText.text = "SELESAI";
+            if (actionButton != null) actionButton.interactable = false;
+            if (actionButtonText != null) actionButtonText.text = "Done";
         }
         else if (selectedQuest.isCompleted)
         {
-            if (questStatusText != null) questStatusText.text = "Siap diterima";
+            if (questStatusText != null) questStatusText.text = "Siap Untuk diklaim";
             if (actionButton != null) actionButton.interactable = true;
             if (actionButtonText != null) actionButtonText.text = "Oke";
         }
         else if (selectedQuest.questType == QuestType.DeliverToNPC)
         {
             bool canDeliver = ResourceManager.Instance != null && ResourceManager.Instance.HasResource(selectedQuest.targetResource, selectedQuest.targetAmount);
-            if (questStatusText != null) questStatusText.text = canDeliver ? "Siap Dikirim" : $"Butuh {selectedQuest.targetAmount} {selectedQuest.targetResource}";
+            if (questStatusText != null)
+                questStatusText.text = (canDeliver ? "Siap Dikirim" : $"Butuh {selectedQuest.targetAmount} {selectedQuest.targetResource}") + timerTag;
             if (actionButton != null) actionButton.interactable = canDeliver;
-            if (actionButtonText != null) actionButtonText.text = "Give";
+            if (actionButtonText != null) actionButtonText.text = "Berikan";
         }
         else
         {
-            if (questStatusText != null) questStatusText.text = "Dalam Pengerjaan";
+            if (questStatusText != null) questStatusText.text = "Dikerjakan" + timerTag;
             if (actionButton != null) actionButton.interactable = false;
             if (actionButtonText != null) actionButtonText.text = "Oke";
         }
     }
 
+    public static string FormatTime(float seconds)
+    {
+        int totalSeconds = Mathf.CeilToInt(Mathf.Max(0f, seconds));
+        int mins = totalSeconds / 60;
+        int secs = totalSeconds % 60;
+        return $"{mins:00}:{secs:00}";
+    }
+
     // --- BUTTON ACTION ("Oke" / "Give" / "Done") ---
     public void OnActionButtonClicked()
     {
-        if (selectedQuest == null || selectedQuest.isClaimed) return;
+        if (selectedQuest == null || selectedQuest.isClaimed || selectedQuest.isFailed) return;
 
         if (selectedQuest.questType == QuestType.DeliverToNPC && !selectedQuest.isCompleted)
         {
@@ -347,7 +416,7 @@ public class QuestManager : MonoBehaviour
 
     public bool TryDeliverQuestResources(Quest quest)
     {
-        if (ResourceManager.Instance == null) return false;
+        if (quest == null || quest.isFailed || ResourceManager.Instance == null) return false;
 
         if (ResourceManager.Instance.SpendSingleResource(quest.targetResource, quest.targetAmount))
         {
@@ -366,7 +435,7 @@ public class QuestManager : MonoBehaviour
         bool changed = false;
         foreach (Quest q in quests)
         {
-            if (!q.isCompleted && q.questType == QuestType.CollectResource && q.targetResource == resource)
+            if (!q.isCompleted && !q.isFailed && q.questType == QuestType.CollectResource && q.targetResource == resource)
             {
                 q.currentAmount = Mathf.Min(q.currentAmount + amount, q.targetAmount);
                 if (q.currentAmount >= q.targetAmount) q.isCompleted = true;
@@ -386,7 +455,7 @@ public class QuestManager : MonoBehaviour
         bool changed = false;
         foreach (Quest q in quests)
         {
-            if (!q.isCompleted && q.questType == QuestType.BuildBuilding &&
+            if (!q.isCompleted && !q.isFailed && q.questType == QuestType.BuildBuilding &&
                 string.Equals(q.targetBuildingName, buildingName, System.StringComparison.OrdinalIgnoreCase))
             {
                 q.currentAmount = Mathf.Min(q.currentAmount + 1, q.targetAmount);

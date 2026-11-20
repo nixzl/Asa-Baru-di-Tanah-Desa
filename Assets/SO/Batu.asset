@@ -15,8 +15,8 @@ MonoBehaviour:
   rockName: Stone Node
   resourceType: 0
   rockPrefab: {fileID: 1608223064362311707, guid: fd913e974a0b4d14cb3cea450db026fe, type: 3}
-  minRockAmount: 4
-  maxRockAmount: 8
+  minRockAmount: 1
+  maxRockAmount: 5
   canRespawn: 1
   respawnDelay: 15
   floatingTextPrefab: {fileID: 1931152062092323636, guid: eeea4918b4af5814fa5e8309c27aa631, type: 3}
