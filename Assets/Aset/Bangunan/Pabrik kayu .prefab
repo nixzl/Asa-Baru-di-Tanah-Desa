@@ -176,7 +176,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45af1846e628de44fbcfbe8e4372f58a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingValidator
-  isValid: 1
+  validGreenColor: {r: 0.2, g: 1, b: 0.2, a: 0.65}
+  blockedRedColor: {r: 1, g: 0.2, b: 0.2, a: 0.65}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!65 &717914651493025096
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -197,7 +201,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 6.0596943, y: 4.1958456, z: 6.6245604}
-  m_Center: {x: 0.88155425, y: 2.0979228, z: 0.00000011920929}
+  m_Center: {x: 0.8815541, y: 2.0979228, z: 0}
 --- !u!114 &7286629091589936275
 MonoBehaviour:
   m_ObjectHideFlags: 0
