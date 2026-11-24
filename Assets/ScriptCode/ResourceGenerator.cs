@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class ResourceGenerator : MonoBehaviour, Interact
 {
-    public enum ResourceType { Rock, Wood }
+    public enum ResourceType { Rock, Wood, Wheat}
 
     public int minWorkersRequired = 1; // Minimum workers needed to start generating resources
     
@@ -65,6 +65,7 @@ public class ResourceGenerator : MonoBehaviour, Interact
 
         if (resourceType == ResourceType.Rock) ResourceManager.Instance.AddRock(amountToGive);
         else if (resourceType == ResourceType.Wood) ResourceManager.Instance.AddWood(amountToGive);
+        else if (resourceType == ResourceType.Wheat) ResourceManager.Instance.AddWheat(amountToGive);
 
         SpawnFloatingText($"+{amountToGive} {resourceType}", Color.green);
     }

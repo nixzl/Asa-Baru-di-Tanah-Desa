@@ -8,6 +8,7 @@ public class BuildingData : ScriptableObject
     public int requiredTotalReputation = 1;
     [Header("Display Info")]
     public string buildingName;
+    [TextArea(2, 4)]
     public string description;
     public Sprite uiIcon;
 

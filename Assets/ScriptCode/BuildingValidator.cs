@@ -1,52 +1,128 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class BuildingValidator : MonoBehaviour
 {
-    public bool isValid = true;
-    private List<Collider> obstacles = new List<Collider>();
-    
-    private MeshRenderer[] renderers;
-    private Color[] originalColors;
+    [Header("Marker Colors")]
+    public Color validGreenColor = new Color(0.2f, 1f, 0.2f, 0.65f);
+    public Color blockedRedColor = new Color(1f, 0.2f, 0.2f, 0.65f);
 
-    void Awake()
+    [Header("Collision Filter")]
+    public LayerMask groundLayer; // Assign your Terrain/Ground layer so the floor doesn't block placement
+
+    private readonly HashSet<Collider> overlappingObstacles = new HashSet<Collider>();
+    private readonly Dictionary<Renderer, Material[]> originalMaterials = new Dictionary<Renderer, Material[]>();
+    private readonly List<Material> previewMaterials = new List<Material>();
+    private GameObject groundMarkerInstance;
+    private bool isBuildPhase = false;
+
+    public bool IsValidPlacement => overlappingObstacles.Count == 0;
+
+    public void BeginBuildPhase(LayerMask groundMask, GameObject markerPrefab = null)
     {
-        renderers = GetComponentsInChildren<MeshRenderer>();
-        originalColors = new Color[renderers.Length];
-        
-        // Save the original colors of the building
-        for (int i = 0; i < renderers.Length; i++)
+        groundLayer = groundMask;
+        isBuildPhase = true;
+        overlappingObstacles.Clear();
+
+        // Cache original materials so they can be cleanly restored when placed
+        Renderer[] renderers = GetComponentsInChildren<Renderer>();
+        foreach (Renderer r in renderers)
         {
-            originalColors[i] = renderers[i].material.color;
+            originalMaterials[r] = r.sharedMaterials;
+
+            Material[] instancedMats = r.materials;
+            for (int i = 0; i < instancedMats.Length; i++)
+            {
+                previewMaterials.Add(instancedMats[i]);
+            }
+        }
+
+        // Optional flat ground marker under the building during build phase only
+        if (markerPrefab != null)
+        {
+            groundMarkerInstance = Instantiate(markerPrefab, transform);
+            groundMarkerInstance.transform.localPosition = new Vector3(0f, 0.05f, 0f);
+            foreach (Renderer r in groundMarkerInstance.GetComponentsInChildren<Renderer>())
+            {
+                previewMaterials.AddRange(r.materials);
+            }
+        }
+
+        UpdateMarkerVisuals();
+    }
+
+    void Update()
+    {
+        if (!isBuildPhase) return;
+
+        // Clean up any destroyed objects (such as harvested trees/rocks) from the overlap list
+        overlappingObstacles.RemoveWhere(col => col == null || !col.enabled || !col.gameObject.activeInHierarchy);
+        UpdateMarkerVisuals();
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (!isBuildPhase) return;
+        if (IsIgnoredCollider(other)) return;
+
+        overlappingObstacles.Add(other);
+        UpdateMarkerVisuals();
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (!isBuildPhase) return;
+
+        if (overlappingObstacles.Remove(other))
+        {
+            UpdateMarkerVisuals();
         }
     }
 
-    void OnTriggerEnter(Collider other)
+    private bool IsIgnoredCollider(Collider other)
     {
-        // Ignore the ground/floor layer so the floor doesn't trigger the red error
-        if (other.gameObject.layer == LayerMask.NameToLayer("Ground")) return;
+        if (other == null || other.transform.IsChildOf(transform)) return true;
 
-        obstacles.Add(other);
-        UpdateColor();
+        // Ignore the ground/terrain layer
+        if (((1 << other.gameObject.layer) & groundLayer) != 0) return true;
+
+        return false;
     }
 
-    void OnTriggerExit(Collider other)
+    private void UpdateMarkerVisuals()
     {
-        if (obstacles.Contains(other))
+        Color targetColor = IsValidPlacement ? validGreenColor : blockedRedColor;
+
+        foreach (Material mat in previewMaterials)
         {
-            obstacles.Remove(other);
-            UpdateColor();
+            if (mat == null) continue;
+            if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", targetColor);
+            if (mat.HasProperty("_Color")) mat.SetColor("_Color", targetColor);
         }
     }
 
-    private void UpdateColor()
+    // Call this when finalizing placement so the placed building never reacts to the player later
+    public void RestoreAndCleanup()
     {
-        isValid = obstacles.Count == 0;
-        
-        for (int i = 0; i < renderers.Length; i++)
+        isBuildPhase = false;
+
+        foreach (var entry in originalMaterials)
         {
-            // Tint red and semi-transparent if blocked, otherwise restore original
-            renderers[i].material.color = isValid ? originalColors[i] : new Color(1f, 0f, 0f, 0.5f);
+            if (entry.Key != null)
+            {
+                entry.Key.sharedMaterials = entry.Value;
+            }
+        }
+
+        foreach (Material mat in previewMaterials)
+        {
+            if (mat != null) Destroy(mat);
+        }
+        previewMaterials.Clear();
+
+        if (groundMarkerInstance != null)
+        {
+            Destroy(groundMarkerInstance);
         }
     }
 }

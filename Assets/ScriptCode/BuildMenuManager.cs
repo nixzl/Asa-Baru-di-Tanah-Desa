@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using TMPro;
 
 public class BuildMenuManager : MonoBehaviour
 {
@@ -14,6 +15,12 @@ public class BuildMenuManager : MonoBehaviour
     public Vector2 buttonClosedPosition;
     public Vector2 buttonOpenPosition;
     public float animationDuration = 10f;
+
+    [Header("Buidling Info")]
+    public GameObject buildingInfoPanel;
+    public TextMeshProUGUI infoTitleText;
+    public TextMeshProUGUI infoDescriptionText;
+    public TextMeshProUGUI infoRequirementText;
 
     [Header("UI References")]
     public GameObject buildMenuPanel;
@@ -60,6 +67,58 @@ public class BuildMenuManager : MonoBehaviour
             }
         }
     }
+
+   public void ShowBuildingInfo(BuildingData data)
+    {
+        if (buildingInfoPanel == null || data == null) return;
+
+        buildingInfoPanel.SetActive(true);
+
+        if (infoTitleText != null)
+        infoTitleText.text = data.buildingName;
+
+        if (infoDescriptionText != null)
+        infoDescriptionText.text = string.IsNullOrWhiteSpace(data.description)
+            ? "No description available."
+            : data.description;
+
+        if (infoRequirementText != null)
+         {
+            int currentPop = ResourceManager.Instance != null ? ResourceManager.Instance.totalWorkers : 0;
+            int currentRep = ReputationManager.Instance != null ? ReputationManager.Instance.currentLevel : 1;
+
+            bool popMet = currentPop >= data.requiredTotalPopulation;
+            bool repMet = currentRep >= data.requiredTotalReputation;
+
+        if (popMet && repMet)
+            {
+                infoRequirementText.text = data.workersProvided > 0
+                    ? $"+{data.workersProvided} Pekerja"
+                    : "";
+                infoRequirementText.color = new Color(0.2f, 0.75f, 0.25f, 1f);
+            }
+        else
+            {
+                // Clearly list what is still required to unlock the building
+                string reqText = "Membutuhkan:\n";
+                if (data.requiredTotalPopulation > 0)
+                    reqText += $"• Populasi: {currentPop}/{data.requiredTotalPopulation}\n";
+                if (data.requiredTotalReputation > 0)
+                    reqText += $"• Reputation Level: {currentRep}/{data.requiredTotalReputation}";
+
+                infoRequirementText.text = reqText.TrimEnd();
+                infoRequirementText.color = Color.red;
+            }
+        }
+    }
+
+public void HideBuildingInfo()
+{
+    if (buildingInfoPanel != null)
+    {
+        buildingInfoPanel.SetActive(false);
+    }
+} 
 
     public void ToggleBuildMenu()
     {

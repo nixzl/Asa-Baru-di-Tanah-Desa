@@ -14,8 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BuildingData
   workersProvided: 2
   requiredTotalPopulation: 3
+  requiredTotalReputation: 1
   buildingName: Rumah Warga
-  description: 
+  description: Rumah warga berkapasitas 2 orang, +2 Populasi
   uiIcon: {fileID: -538488626, guid: a435911d667a87745962edc6ed900373, type: 3}
   buildingPrefab: {fileID: 8717772090231240208, guid: 03b79d5a8f55e144688dd0cbe890fb3a, type: 3}
   rockCost: 100

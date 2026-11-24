@@ -16,7 +16,7 @@ MonoBehaviour:
   requiredTotalPopulation: 10
   requiredTotalReputation: 2
   buildingName: Rumah Warga (menengah)
-  description: 
+  description: Rumah warga berkapasitas 4 orang, +4 Populasi
   uiIcon: {fileID: -1056758657, guid: a435911d667a87745962edc6ed900373, type: 3}
   buildingPrefab: {fileID: 3230124229236876901, guid: b9c51b7f7d3013a4e9d035ddd3074ca8, type: 3}
   rockCost: 70
