@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RockData
   rockName: Stone Node
   resourceType: 0
-  rockPrefab: {fileID: 1608223064362311707, guid: fd913e974a0b4d14cb3cea450db026fe, type: 3}
+  rockPrefab: {fileID: 4215959214258491184, guid: 64e2f79652e57244d85d7d68f0fa1818, type: 3}
   minRockAmount: 1
   maxRockAmount: 5
   canRespawn: 1
