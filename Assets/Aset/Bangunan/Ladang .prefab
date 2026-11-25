@@ -101,10 +101,10 @@ PrefabInstance:
       addedObject: {fileID: -2846042522676083772}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9b0eab3948997ad448e534460411167b, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 7028761588883319975}
+      addedObject: {fileID: 1004381462072949682}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9b0eab3948997ad448e534460411167b, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1004381462072949682}
+      addedObject: {fileID: 6555537026601408865}
   m_SourcePrefab: {fileID: 100100000, guid: 9b0eab3948997ad448e534460411167b, type: 3}
 --- !u!4 &8305783529022382135 stripped
 Transform:
@@ -135,8 +135,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 6.9059463, y: 3.0939932, z: 3.5885384}
-  m_Center: {x: 0.09065056, y: 1.4175439, z: -0.27353323}
+  m_Size: {x: 6.9059463, y: 3.0939932, z: 7.588538}
+  m_Center: {x: 0.09065056, y: 1.4175439, z: 1.7264667}
 --- !u!54 &8440473659137614294
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -176,28 +176,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45af1846e628de44fbcfbe8e4372f58a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingValidator
-  isValid: 1
---- !u!65 &7028761588883319975
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8651347476916943501}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
+  validGreenColor: {r: 0.2, g: 1, b: 0.2, a: 0.65}
+  blockedRedColor: {r: 1, g: 0.2, b: 0.2, a: 0.65}
+  groundLayer:
     serializedVersion: 2
     m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 3.734746, y: 3.0939932, z: 3.587301}
-  m_Center: {x: -1.4949498, y: 1.4175439, z: -0.27415192}
 --- !u!114 &1004381462072949682
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -218,3 +201,24 @@ MonoBehaviour:
   textSpawnPoint: {fileID: 6341423525386101927}
   assignedWorkers: 0
   workTimeRemaining: 0
+--- !u!65 &6555537026601408865
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8651347476916943501}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 6.9059463, y: 3.0939932, z: 2.7526526}
+  m_Center: {x: 0.09065056, y: 1.4175439, z: -0.6914761}
