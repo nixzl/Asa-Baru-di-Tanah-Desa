@@ -10,6 +10,7 @@ public class DialogueManager : MonoBehaviour
 
     [Header("Dialogue UI References")]
     public GameObject dialoguePanel;
+    public Image npcPortraitImage; 
     public TextMeshProUGUI npcNameText;
     public TextMeshProUGUI dialogueBodyText;
 
@@ -17,6 +18,12 @@ public class DialogueManager : MonoBehaviour
     public Button nextOrAcceptButton;
     public TextMeshProUGUI nextOrAcceptButtonText;
     public Button declineButton;
+
+    [Header("Button Labels")]
+    public string nextLabel = "Lanjut";
+    public string acceptLabel = "Terima";
+    public string declineLabel = "Tolak";
+    public string closeLabel = "Tutup";
 
     private Queue<string> sentences = new Queue<string>();
     private Quest pendingQuestOffer;
@@ -32,9 +39,15 @@ public class DialogueManager : MonoBehaviour
     void Start()
     {
         if (dialoguePanel != null) dialoguePanel.SetActive(false);
+
+        if (declineButton != null)
+        {
+            TextMeshProUGUI declineTxt = declineButton.GetComponentInChildren<TextMeshProUGUI>();
+            if (declineTxt != null) declineTxt.text = declineLabel;
+        }
     }
 
-    public void StartDialogue(string npcName, string[] lines, Quest questToOffer = null, Action onComplete = null)
+    public void StartDialogue(string npcName, string[] lines, Sprite npcPortrait = null, Quest questToOffer = null, Action onComplete = null)
     {
         if (dialoguePanel == null) return;
 
@@ -43,6 +56,20 @@ public class DialogueManager : MonoBehaviour
         isOfferingQuest = (questToOffer != null);
 
         if (npcNameText != null) npcNameText.text = npcName;
+
+        // Show or hide the NPC portrait image
+        if (npcPortraitImage != null)
+        {
+            if (npcPortrait != null)
+            {
+                npcPortraitImage.sprite = npcPortrait;
+                npcPortraitImage.gameObject.SetActive(true);
+            }
+            else
+            {
+                npcPortraitImage.gameObject.SetActive(false);
+            }
+        }
 
         sentences.Clear();
         if (lines != null && lines.Length > 0)
@@ -54,18 +81,17 @@ public class DialogueManager : MonoBehaviour
         }
         else
         {
-            sentences.Enqueue("Hello! Can you help me with something?");
+            sentences.Enqueue("Halo! Bisakah kamu membantuku?");
         }
 
         dialoguePanel.SetActive(true);
-        Time.timeScale = 0f; // Pause movement and world timers while talking
+        Time.timeScale = 0f;
 
         DisplayNextSentence();
     }
 
     public void DisplayNextSentence()
     {
-        // If no more sentences remain, handle the button click as Accept or Close
         if (sentences.Count == 0)
         {
             if (isOfferingQuest && pendingQuestOffer != null && QuestManager.Instance != null)
@@ -85,20 +111,17 @@ public class DialogueManager : MonoBehaviour
 
         if (isLastLine && isOfferingQuest)
         {
-            // Final line of a quest offer: show Accept & Decline
-            if (nextOrAcceptButtonText != null) nextOrAcceptButtonText.text = "Terima";
+            if (nextOrAcceptButtonText != null) nextOrAcceptButtonText.text = acceptLabel;
             if (declineButton != null) declineButton.gameObject.SetActive(true);
         }
         else if (isLastLine)
         {
-            // Final line of normal conversation
-            if (nextOrAcceptButtonText != null) nextOrAcceptButtonText.text = "Minggat";
+            if (nextOrAcceptButtonText != null) nextOrAcceptButtonText.text = closeLabel;
             if (declineButton != null) declineButton.gameObject.SetActive(false);
         }
         else
         {
-            // More lines remaining
-            if (nextOrAcceptButtonText != null) nextOrAcceptButtonText.text = "Selanjutnya";
+            if (nextOrAcceptButtonText != null) nextOrAcceptButtonText.text = nextLabel;
             if (declineButton != null) declineButton.gameObject.SetActive(false);
         }
     }

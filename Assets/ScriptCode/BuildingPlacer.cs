@@ -1,12 +1,13 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.AI;
 
 public class BuildingPlacer : MonoBehaviour
 {
     [Header("Placement Settings")]
     public GameObject instructionTextUI;
     public LayerMask groundLayer;
-    public GameObject buildMarkerPrefab; // Optional ground highlight prefab
+    public GameObject buildMarkerPrefab;
 
     public static BuildingPlacer Instance;
     public float lastPlacementTime = 0f;
@@ -19,7 +20,6 @@ public class BuildingPlacer : MonoBehaviour
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
 
-        // Fallback to the "Ground" layer if Ground Layer isn't assigned in the Inspector
         if (groundLayer == 0)
         {
             groundLayer = LayerMask.GetMask("Ground");
@@ -73,7 +73,6 @@ public class BuildingPlacer : MonoBehaviour
 
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-            // Limit raycast to ONLY hit the floor, preventing the building from climbing walls
             if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, groundLayer))
             {
                 previewBuilding.transform.position = hit.point;
@@ -83,7 +82,6 @@ public class BuildingPlacer : MonoBehaviour
                 {
                     BuildingValidator validator = previewBuilding.GetComponent<BuildingValidator>();
 
-                    // Block placement if the building is glowing red
                     if (validator != null && !validator.IsValidPlacement)
                     {
                         Debug.Log("Cannot place building here: area is blocked!");
@@ -109,13 +107,21 @@ public class BuildingPlacer : MonoBehaviour
 
                         if (instructionTextUI != null) instructionTextUI.SetActive(false);
 
-                        // Finalize placement: Restore default layers and physics
+                        // Finalize placement: Restore default layers and solid colliders
                         SetLayerRecursively(previewBuilding, LayerMask.NameToLayer("Default"));
 
                         Collider[] colliders = previewBuilding.GetComponentsInChildren<Collider>();
-                        foreach (Collider col in colliders) col.isTrigger = false;
+                        foreach (Collider col in colliders)
+                        {
+                            col.isTrigger = false;
 
-                        // Remove preview mechanics so it becomes a normal static building
+                            // Carve a hole in the NavMesh for every BoxCollider (shed + fences)
+                            if (col is BoxCollider box)
+                            {
+                                AddCarvingObstacle(box);
+                            }
+                        }
+
                         Destroy(previewBuilding.GetComponent<Rigidbody>());
 
                         previewBuilding = null;
@@ -124,6 +130,28 @@ public class BuildingPlacer : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void AddCarvingObstacle(BoxCollider box)
+    {
+        GameObject targetObj = box.gameObject;
+
+        // Unity allows only one NavMeshObstacle per GameObject; create a child if one already exists
+        if (targetObj.GetComponent<NavMeshObstacle>() != null)
+        {
+            GameObject subObstacle = new GameObject("NavMeshFenceObstacle");
+            subObstacle.transform.SetParent(targetObj.transform, false);
+            subObstacle.transform.localPosition = Vector3.zero;
+            subObstacle.transform.localRotation = Quaternion.identity;
+            subObstacle.transform.localScale = Vector3.one;
+            targetObj = subObstacle;
+        }
+
+        NavMeshObstacle obstacle = targetObj.AddComponent<NavMeshObstacle>();
+        obstacle.shape = NavMeshObstacleShape.Box;
+        obstacle.center = box.center;
+        obstacle.size = box.size;
+        obstacle.carving = true;
     }
 
     private void SetLayerRecursively(GameObject obj, int newLayer)

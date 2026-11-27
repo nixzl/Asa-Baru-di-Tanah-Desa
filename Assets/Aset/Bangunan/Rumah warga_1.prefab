@@ -58,9 +58,6 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2499cb50dc715d549977775746b42827, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5240580813633541681}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2499cb50dc715d549977775746b42827, type: 3}
-      insertIndex: -1
       addedObject: {fileID: -3340998631667779064}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2499cb50dc715d549977775746b42827, type: 3}
       insertIndex: -1
@@ -74,19 +71,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 2499cb50dc715d549977775746b42827, type: 3}
   m_PrefabInstance: {fileID: 2311152613208808244}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &5240580813633541681
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3230124229236876901}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 45af1846e628de44fbcfbe8e4372f58a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BuildingValidator
-  isValid: 1
 --- !u!54 &-3340998631667779064
 Rigidbody:
   m_ObjectHideFlags: 0

@@ -2,91 +2,163 @@ using UnityEngine;
 
 public class ResourceGenerator : MonoBehaviour, Interact
 {
-    public enum ResourceType { Rock, Wood, Wheat}
+    [Header("Production Settings")]
+    public ResourceCategory resourceType = ResourceCategory.Wheat;
+    public int minWorkersRequired = 1;
+    public int baseYieldPerMinute = 5;
 
-    public int minWorkersRequired = 1; // Minimum workers needed to start generating resources
-    
-    [Header("Settings")]
-    public ResourceType resourceType;
-    public int minAmount = 5;
-    public int maxAmount = 15;
-    
-    [Header("VFX")]
+    [Header("Optional VFX")]
     public GameObject floatingTextPrefab;
-    public Transform textSpawnPoint; // A spot floating slightly above the roof
+    public Vector3 textOffset = new Vector3(0f, 2f, 0f);
 
-    [Header("Current Status")]
-    public int assignedWorkers = 0;
-    public float workTimeRemaining = 0f; // Tracked in seconds
-    private float generateTimer = 0f;
+    [HideInInspector] public bool isWorking = false;
+    [HideInInspector] public int assignedWorkers = 0;
+    [HideInInspector] public float remainingSeconds = 0f;
+    [HideInInspector] public float totalWorkSeconds = 0f;
 
+    // Triggered when the player clicks the building and walks into interaction range
     public void Interact()
     {
-        // Open the UI Panel when the player walks up and touches the building
-        BuildingUIManager.Instance.OpenPanel(this);
+        if (BuildingUIManager.Instance != null)
+        {
+            BuildingUIManager.Instance.OpenPanel(this);
+        }
     }
 
     void Update()
     {
-        if (assignedWorkers > 0 && workTimeRemaining > 0)
+        if (!isWorking) return;
+
+        remainingSeconds -= Time.deltaTime;
+
+        if (remainingSeconds <= 0f)
         {
-            workTimeRemaining -= Time.deltaTime;
-            generateTimer += Time.deltaTime;
-
-            // Every 30 seconds, generate resources
-            if (generateTimer >= 30f) 
-            {
-                GenerateResources();
-                generateTimer = 0f;
-            }
-
-            // When the total assigned time runs out
-            if (workTimeRemaining <= 0)
-            {
-                StopWorking();
-            }
+            CompleteProduction();
         }
     }
 
     public void AssignWork(int workers, int minutes)
     {
-        for (int i = 0; i < workers; i++) ResourceManager.Instance.AssignWorker();
-        
-        assignedWorkers += workers;
-        workTimeRemaining += (minutes * 60f); // Convert minutes to seconds
-        
-        SpawnFloatingText($"+{workers} Worker(s)", Color.yellow);
-    }
+        if (isWorking || ResourceManager.Instance == null) return;
 
-    private void GenerateResources()
-    {
-        // Multiply the resources gathered by the number of workers assigned
-        int amountToGive = Random.Range(minAmount, maxAmount + 1) * assignedWorkers;
-
-        if (resourceType == ResourceType.Rock) ResourceManager.Instance.AddRock(amountToGive);
-        else if (resourceType == ResourceType.Wood) ResourceManager.Instance.AddWood(amountToGive);
-        else if (resourceType == ResourceType.Wheat) ResourceManager.Instance.AddWheat(amountToGive);
-
-        SpawnFloatingText($"+{amountToGive} {resourceType}", Color.green);
-    }
-
-    private void StopWorking()
-    {
-        for (int i = 0; i < assignedWorkers; i++) ResourceManager.Instance.UnassignWorker();
-        
-        if (assignedWorkers > 0) SpawnFloatingText($"-{assignedWorkers} Worker(s) Finished", Color.red);
-        
-        assignedWorkers = 0;
-        workTimeRemaining = 0f;
-        generateTimer = 0f;
-    }
-
-    public void SpawnFloatingText(string message, Color color)
-    {
-        if (floatingTextPrefab != null && textSpawnPoint != null)
+        int actualAssigned = 0;
+        for (int i = 0; i < workers; i++)
         {
-            GameObject textObj = Instantiate(floatingTextPrefab, textSpawnPoint.position, Quaternion.identity);
-            textObj.GetComponent<Floattext>().Setup(message, color);
+            if (ResourceManager.Instance.AssignWorker())
+                actualAssigned++;
         }
+
+        if (actualAssigned < minWorkersRequired)
+        {
+            // Refund if not enough workers were available
+            for (int i = 0; i < actualAssigned; i++)
+                ResourceManager.Instance.UnassignWorker();
+            return;
+        }
+
+        assignedWorkers = actualAssigned;
+        totalWorkSeconds = minutes * 60f;
+        remainingSeconds = totalWorkSeconds;
+        isWorking = true;
+
+        if (BuildingUIManager.Instance != null)
+            BuildingUIManager.Instance.RegisterActiveBuilding(this);
+    }
+
+    // Adjust worker count while production is already running
+    public void UpdateWorkersMidProduction(int newWorkerCount)
+    {
+        if (!isWorking || ResourceManager.Instance == null) return;
+
+        // If dropped below minimum required, recall everyone and stop production
+        if (newWorkerCount < minWorkersRequired)
+        {
+            UnassignAllWorkersMidProduction();
+            return;
+        }
+
+        int difference = newWorkerCount - assignedWorkers;
+
+        if (difference < 0)
+        {
+            int toUnassign = Mathf.Abs(difference);
+            for (int i = 0; i < toUnassign; i++)
+            {
+                ResourceManager.Instance.UnassignWorker();
+                assignedWorkers--;
+            }
+        }
+        else if (difference > 0)
+        {
+            for (int i = 0; i < difference; i++)
+            {
+                if (ResourceManager.Instance.AssignWorker())
+                    assignedWorkers++;
+            }
+        }
+    }
+
+    // Immediately unassign all workers and cancel active production
+    public void UnassignAllWorkersMidProduction()
+    {
+        if (!isWorking) return;
+
+        if (ResourceManager.Instance != null)
+        {
+            for (int i = 0; i < assignedWorkers; i++)
+            {
+                ResourceManager.Instance.UnassignWorker();
+            }
+        }
+
+        assignedWorkers = 0;
+        remainingSeconds = 0f;
+        totalWorkSeconds = 0f;
+        isWorking = false;
+
+        if (BuildingUIManager.Instance != null)
+            BuildingUIManager.Instance.UnregisterActiveBuilding(this);
+    }
+
+    private void CompleteProduction()
+    {
+        float minutesWorked = totalWorkSeconds / 60f;
+        int producedAmount = Mathf.Max(1, Mathf.RoundToInt(baseYieldPerMinute * minutesWorked * assignedWorkers));
+
+        if (ResourceManager.Instance != null)
+        {
+            switch (resourceType)
+            {
+                case ResourceCategory.Stone: ResourceManager.Instance.AddRock(producedAmount); break;
+                case ResourceCategory.Wood:  ResourceManager.Instance.AddWood(producedAmount); break;
+                case ResourceCategory.Wheat: ResourceManager.Instance.AddWheat(producedAmount); break;
+            }
+
+            // Return workers to available pool
+            for (int i = 0; i < assignedWorkers; i++)
+            {
+                ResourceManager.Instance.UnassignWorker();
+            }
+        }
+
+        if (QuestManager.Instance != null)
+        {
+            QuestManager.Instance.AddResourceCollected(resourceType, producedAmount);
+        }
+
+        if (floatingTextPrefab != null)
+        {
+            GameObject textObj = Instantiate(floatingTextPrefab, transform.position + textOffset, Quaternion.identity);
+            Floattext ft = textObj.GetComponent<Floattext>();
+            if (ft != null) ft.Setup($"+{producedAmount} {resourceType}", Color.green);
+        }
+
+        assignedWorkers = 0;
+        remainingSeconds = 0f;
+        totalWorkSeconds = 0f;
+        isWorking = false;
+
+        if (BuildingUIManager.Instance != null)
+            BuildingUIManager.Instance.UnregisterActiveBuilding(this);
     }
 }

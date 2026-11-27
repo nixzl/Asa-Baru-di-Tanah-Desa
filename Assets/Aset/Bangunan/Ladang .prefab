@@ -92,19 +92,13 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9b0eab3948997ad448e534460411167b, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4676032411608144594}
+      addedObject: {fileID: -6950262687742256454}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9b0eab3948997ad448e534460411167b, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 8440473659137614294}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9b0eab3948997ad448e534460411167b, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: -2846042522676083772}
+      addedObject: {fileID: 1219551567941805113}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9b0eab3948997ad448e534460411167b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1004381462072949682}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9b0eab3948997ad448e534460411167b, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 6555537026601408865}
   m_SourcePrefab: {fileID: 100100000, guid: 9b0eab3948997ad448e534460411167b, type: 3}
 --- !u!4 &8305783529022382135 stripped
 Transform:
@@ -116,7 +110,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 9b0eab3948997ad448e534460411167b, type: 3}
   m_PrefabInstance: {fileID: 8416853184052856796}
   m_PrefabAsset: {fileID: 0}
---- !u!65 &4676032411608144594
+--- !u!65 &-6950262687742256454
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -131,56 +125,33 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 6.9059463, y: 3.0939932, z: 7.588538}
-  m_Center: {x: 0.09065056, y: 1.4175439, z: 1.7264667}
---- !u!54 &8440473659137614294
-Rigidbody:
+  m_Size: {x: 3.8103132, y: 3.0939932, z: 3.0948207}
+  m_Center: {x: -1.4571662, y: 1.4175439, z: -0.52039206}
+--- !u!65 &1219551567941805113
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8651347476916943501}
-  serializedVersion: 5
-  m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
---- !u!114 &-2846042522676083772
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8651347476916943501}
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 45af1846e628de44fbcfbe8e4372f58a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BuildingValidator
-  validGreenColor: {r: 0.2, g: 1, b: 0.2, a: 0.65}
-  blockedRedColor: {r: 1, g: 0.2, b: 0.2, a: 0.65}
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 0
+  serializedVersion: 3
+  m_Size: {x: 0.50904083, y: 3.0939932, z: 7.7526526}
+  m_Center: {x: 3.2891035, y: 1.4175439, z: 1.8085239}
 --- !u!114 &1004381462072949682
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -201,24 +172,3 @@ MonoBehaviour:
   textSpawnPoint: {fileID: 6341423525386101927}
   assignedWorkers: 0
   workTimeRemaining: 0
---- !u!65 &6555537026601408865
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8651347476916943501}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 6.9059463, y: 3.0939932, z: 2.7526526}
-  m_Center: {x: 0.09065056, y: 1.4175439, z: -0.6914761}

@@ -83,8 +83,7 @@ public class NPCQuestIndicator : MonoBehaviour
 
     private void UpdateIndicatorState()
     {
-        
-        Quest mission = questNPC.missionToGive;
+        Quest mission = questNPC.ActiveMission;
 
         if (mission == null || QuestManager.Instance == null)
         {
@@ -92,31 +91,34 @@ public class NPCQuestIndicator : MonoBehaviour
             return;
         }
 
-            // Case 1: Not yet accepted OR previously failed -> Show gold "!"
+        if (!QuestManager.Instance.IsPrerequisiteMet(mission))
+        {
+            SetState(IndicatorState.Hidden);
+            return;
+        }
+
+        // Case 1: Not yet accepted OR previously failed -> Show gold "!"
         if (!QuestManager.Instance.HasQuest(mission) || mission.isFailed)
         {
             SetState(IndicatorState.Available);
             return;
         }
 
-        // Case 2: Already finished or claimed -> Hide indicator completely
+        // Case 2: Already finished or claimed -> Hide indicator
         if (mission.isClaimed || mission.isCompleted)
         {
             SetState(IndicatorState.Hidden);
             return;
         }
 
-        // Case 3: Delivery quest where the player now holds enough resources -> Show green "?"
-        if (mission.questType == QuestType.DeliverToNPC && ResourceManager.Instance != null)
+        // Case 3: Delivery quest where player holds all required resources -> Show green "?"
+        if (mission.HasDeliveryObjective() && QuestManager.Instance.CanDeliverAllObjectives(mission))
         {
-            if (ResourceManager.Instance.HasResource(mission.targetResource, mission.targetAmount))
-            {
-                SetState(IndicatorState.ReadyToDeliver);
-                return;
-            }
+            SetState(IndicatorState.ReadyToDeliver);
+            return;
         }
 
-        // Case 4: Accepted and still working on it -> Show grey "?"
+        // Case 4: Accepted and in progress -> Show grey "?"
         SetState(IndicatorState.InProgress);
     }
 
